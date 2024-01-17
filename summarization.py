@@ -1,5 +1,6 @@
 import io
 import streamlit as st
+import SentencePiece 
 from transformers import MBartTokenizer, MBartForConditionalGeneration
 
 model_name = "IlyaGusev/mbart_ru_sum_gazeta"
