@@ -7,6 +7,7 @@ tokenizer = MBartTokenizer.from_pretrained(model_name)
 model = MBartForConditionalGeneration.from_pretrained(model_name)
 
 @st.cache(allow_output_mutation=True)
+
 st.title('Суммаризация текстов')
 
 result = st.button('Сгенерировать аннотацию')
