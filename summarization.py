@@ -1,27 +1,81 @@
-import io
+import torch
 import streamlit as st
-import SentencePiece 
-from transformers import MBartTokenizer, MBartForConditionalGeneration
+from transformers import BartTokenizer, BartForConditionalGeneration
+from transformers import T5Tokenizer, T5ForConditionalGeneration
 
-model_name = "IlyaGusev/mbart_ru_sum_gazeta"
-tokenizer = MBartTokenizer.from_pretrained(model_name)
-model = MBartForConditionalGeneration.from_pretrained(model_name)
+st.title('Text Summarization Demo')
+st.markdown('Using BART and T5 transformer model')
 
-st.title('Суммаризация текстов')
+model = st.selectbox('Select the model', ('BART', 'T5'))
 
-result = st.button('Сгенерировать аннотацию')
-if result:
-    article_text = """Особого внимания заслуживают рекомендации ЮНЕСКО по охране культурно-исторического и природного наследия, подчеркивающие важность его сохранения для дальнейшего развития туризма. Памятники истории, культуры и природы являются национальными достояниями страны. Освоение территории для туристических целей требует бережного подхода по принципу: «Сохрани -восстанови - не навреди». Многие регионы  богаты уникальными историческими территориями (древние города, дворцовые ансамбли, историко-культурные памятники и др.). При развитии туристской инфраструктуры важно не нарушить исторический облик территории. Каждый вновь создаваемый туристический объект должен соответствовать национальным особенностям и традициям и одновременно иметь свой неповторимый облик.  Ханты-Мансийский автономный округ на протяжении последних лет позиционирует себя как туристический район. Среди различных видов туризма особое место занимает этнографический туризм, связанный с культурой малочисленных народов Севера, проживающих на территории округа. В регионе есть хорошие перспективы для въездного туризма. Ни в одном крае нет такого количества видов рыб, животных, птиц, а также рек и озер, ягодных болот и таежных лесов, предлагающих заняться охотой, рыбалкой и сбором дикоросов. Этнотуризм, являясь природосообразным видом деятельности, при правильной организации стимулирует развитие традиционных промыслов и ремесел и может стать в ближайшие годы одним из источников дохода для местных жителей. Особенность становления этнографического туризма на территории округа заключается в том, что различные шаги в этой области предпринимались без анализа ресурсов, имеющихся на территории. Учет и анализ имеющихся ресурсов позволяет более продуктивно организовать туристический бизнес на территории ХМАО - Югры. Все объекты, ко -торые привлекают туристов и участвуют в их обслуживании, принадлежат к туристическим ресурсам. Сюда относятся природные ресурсы (памятники природы, заповедники, ландшафты для отдыха) и культурные (памятники архитектуры, музеи, театры, места, связанные с жизнью знаменитых людей). Перспективность местности с точки зрения развития туризма, в особенности познавательного, определяется наличием культурно-исторических ресурсов: памятников истории и культуры. Сюда же можно отнести культуру народов с их обычаями, традициями и бытом. На рекреационных ресурсах, которые используются для удовлетворения потребностей населения, хотелось бы остановиться подробнее. К этим ресурсам относятся комплексы и компоненты (рельеф, климат, водоемы, растительный и животный мир). Культурно-исторические достопримечательности, экономический потенциал территории, включающий инфраструктуру, трудовые ресурсы. Трудовыми ресурсами является трудоспособное население, способное производить какой-либо полезный продукт, а также профессиональные навыки и образовательно-культурный уровень этого населения. Все объекты, которые привлекают туристов и участвуют в их обслуживании, принадлежат к туристическим ресурсам. Сюда относятся уже названные природные ресурсы и культурные (различные фестивали, соревнования, памятники архитектуры музеи, центры). Природные ресурсы оценивают с точки зрения функциональной пригодности для определенного вида туризма. Относительно туристической деятельности выделяют еще обеспечивающие ресурсы, сюда относятся гостиницы и другие средства размещения, транспорт, магазины и т. д.  В литературе этнографический туризм выступает в качестве познавательного туризма, имеющего своей целью знакомство с культурой и бытом народов мира. Н.И. Кабушкин дает следующее определение: «Этнографический туризм - знакомство с традиционным бытом местного населения», некоторые авторы - В. Курина предлагают назвать такой туризм «этническим». Как одно из направлений этнического туризма выделяют «аборигенный» туризм, в котором участвуют представители коренного населения. На Западе по отношению к туризму, организуемому с участием аборигенов, используется понятие «альтернативный» туризм. Он направлен на поддержание местной экономики, и основная часть прибыли должна поступить местному населению [1]. В последнее время в литературе можно встретить название «этнокультурный» туризм,под которым понимаются поездки, организуемые в места проживания малочисленных народов. Итак, можно пользоваться определением этнографического туризма как разновидности культурно-познавательного туризма, ставящего перед собой цель знакомства с самобытной культурой и бытом различных народов. Одними из главных ресурсов для организации этнографического туризма являются этнографические объекты. Этнографическим объектом является культурно-исторический объект, содержащий информацию об этнических проявлениях традиционной культуры. Эти объекты обязательно должны сохранять этническую специфику."""
-    st.write('**Результаты:**')
-    input_ids = tokenizer(
-       [article_text],
-       max_length=600,
-       padding="max_length",
-       truncation=True,
-       return_tensors="pt",
-       )["input_ids"]
-    output_ids = model.generate(
-      input_ids=input_ids,
-      no_repeat_ngram_size=4)[0]
-    summary = tokenizer.decode(output_ids, skip_special_tokens=True)
-    print(summary)
+if model == 'BART':
+    _num_beams = 4
+    _no_repeat_ngram_size = 3
+    _length_penalty = 1
+    _min_length = 12
+    _max_length = 128
+    _early_stopping = True
+else:
+    _num_beams = 4
+    _no_repeat_ngram_size = 3
+    _length_penalty = 2
+    _min_length = 30
+    _max_length = 200
+    _early_stopping = True
+
+col1, col2, col3 = st.beta_columns(3)
+_num_beams = col1.number_input("num_beams", value=_num_beams)
+_no_repeat_ngram_size = col2.number_input("no_repeat_ngram_size", value=_no_repeat_ngram_size)
+_length_penalty = col3.number_input("length_penalty", value=_length_penalty)
+
+col1, col2, col3 = st.beta_columns(3)
+_min_length = col1.number_input("min_length", value=_min_length)
+_max_length = col2.number_input("max_length", value=_max_length)
+_early_stopping = col3.number_input("early_stopping", value=_early_stopping)
+
+text = st.text_area('Text Input')
+
+
+def run_model(input_text):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    if model == "BART":
+        bart_model = BartForConditionalGeneration.from_pretrained("facebook/bart-base")
+        bart_tokenizer = BartTokenizer.from_pretrained("facebook/bart-base")
+        input_text = str(input_text)
+        input_text = ' '.join(input_text.split())
+        input_tokenized = bart_tokenizer.encode(input_text, return_tensors='pt').to(device)
+        summary_ids = bart_model.generate(input_tokenized,
+                                          num_beams=_num_beams,
+                                          no_repeat_ngram_size=_no_repeat_ngram_size,
+                                          length_penalty=_length_penalty,
+                                          min_length=_min_length,
+                                          max_length=_max_length,
+                                          early_stopping=_early_stopping)
+
+        output = [bart_tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g insummary_ids]
+        st.write('Summary')
+        st.success(output[0])
+
+    else:
+        t5_model = T5ForConditionalGeneration.from_pretrained("t5-base")
+        t5_tokenizer = T5Tokenizer.from_pretrained("t5-base")
+        input_text = str(input_text).replace('\n', '')
+        input_text = ' '.join(input_text.split())
+        input_tokenized = t5_tokenizer.encode(input_text, return_tensors="pt").to(device)
+        summary_task = torch.tensor([[21603, 10]]).to(device)
+        input_tokenized = torch.cat([summary_task, input_tokenized], dim=-1).to(device)
+        summary_ids = t5_model.generate(input_tokenized,
+                                        num_beams=_num_beams,
+                                        no_repeat_ngram_size=_no_repeat_ngram_size,
+                                        length_penalty=_length_penalty,
+                                        min_length=_min_length,
+                                        max_length=_max_length,
+                                        early_stopping=_early_stopping)
+        output = [t5_tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in summary_ids]
+        st.write('Summary')
+        st.success(output[0])
+
+
+if st.button('Submit'):
+    run_model(text)
