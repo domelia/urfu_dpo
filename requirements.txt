@@ -1,3 +1,5 @@
 streamlit
 tensorflow-cpu
 transformers
+MBartTokenizer
+MBartForConditionalGeneration
