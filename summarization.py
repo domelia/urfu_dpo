@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from PIL import Image
 import torch
 from transformers import pipeline
@@ -19,6 +20,19 @@ def load_summarizer():
 
 def generate_chunks(inp_str):
     max_chunk=50000
+=======
+import streamlit as st
+from transformers import pipeline
+
+@st.cache(allow_output_mutation=True)
+def load_summarizer():
+    model = pipeline("summarization", device=0)
+    return model
+
+
+def generate_chunks(inp_str):
+    max_chunk = 500
+>>>>>>> 074e8ba622f6da59f38d8e8467383739550cbc09
     inp_str = inp_str.replace('.', '.<eos>')
     inp_str = inp_str.replace('?', '?<eos>')
     inp_str = inp_str.replace('!', '!<eos>')
@@ -42,6 +56,7 @@ def generate_chunks(inp_str):
 
 
 summarizer = load_summarizer()
+<<<<<<< HEAD
 
 st.title("Приложение по созданию аннотаций")
 st.sidebar.title("О приложении")
@@ -65,4 +80,22 @@ with st.spinner("Подождите, идет процесс создания а
         chunks = generate_chunks(sentence)
         res = summarizer(chunks)
         text = ' '.join([summ['summary_text'] for summ in res])
+=======
+st.title("Summarize Text")
+sentence = st.text_area('Please paste your article :', height=30)
+button = st.button("Summarize")
+
+max = st.sidebar.slider('Select max', 50, 500, step=10, value=150)
+min = st.sidebar.slider('Select min', 10, 450, step=10, value=50)
+do_sample = st.sidebar.checkbox("Do sample", value=False)
+with st.spinner("Generating Summary.."):
+    if button and sentence:
+        chunks = generate_chunks(sentence)
+        res = summarizer(chunks,
+                         max_length=max, 
+                         min_length=min, 
+                         do_sample=do_sample)
+        text = ' '.join([summ['summary_text'] for summ in res])
+        # st.write(result[0]['summary_text'])
+>>>>>>> 074e8ba622f6da59f38d8e8467383739550cbc09
         st.write(text)
