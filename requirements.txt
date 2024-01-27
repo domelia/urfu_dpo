@@ -1,5 +1,4 @@
 image
 streamlit
 transformers
-torch
-sentencepiece
+requests
